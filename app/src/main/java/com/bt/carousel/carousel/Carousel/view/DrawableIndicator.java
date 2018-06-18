@@ -7,13 +7,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bt.carousel.carousel.Carousel.CarouselConstant;
+import com.bt.carousel.carousel.Carousel.base.IndicatorBaseView;
 
 
 /**
  * Created by 18030693 on 2018/6/14.
  */
 
-public class DrawableIndicator extends IndicatorBaseView{
+public class DrawableIndicator extends IndicatorBaseView {
     public DrawableIndicator(Context context) {
         super(context);
     }

@@ -3,7 +3,9 @@ package com.bt.carousel.carousel.Carousel.adapter;
 import android.content.Context;
 import android.view.View;
 
-import com.bt.carousel.carousel.Carousel.view.PagerViewHolder;
+import com.bt.carousel.carousel.Carousel.CarouselMainActivity;
+import com.bt.carousel.carousel.Carousel.base.CarouselBaseAdapter;
+import com.bt.carousel.carousel.Carousel.model.PagerViewHolder;
 import com.bt.carousel.carousel.R;
 
 
@@ -23,10 +25,21 @@ public class CarouselAdapter extends CarouselBaseAdapter {
      * 设置根视图以及元素,点击事件等
      */
     @Override
-    protected void convert(PagerViewHolder viewHolder, final int position) {
-
-        viewHolder.setConvertView(R.layout.item).setImageResource(R.id.home_banner_item_img,
-                getData().get(position).toString(),R.drawable.default_bg,R.drawable.default_bg);
+    protected void convert(PagerViewHolder viewHolder,Object data, final int position) {
+        if (!((CarouselMainActivity.Page)data).isUseNet) {
+            viewHolder.setConvertView(R.layout.item)
+                    .setBackgroundResource(R.id.page_parent, (((CarouselMainActivity.Page)data)).imgRes)
+                    .setText(R.id.home_banner_item_text, (((CarouselMainActivity.Page)data)).text);
+        }else if(((CarouselMainActivity.Page)data).isUseDefault){
+            viewHolder.setConvertView(R.layout.item)
+                    .setImageResource(R.id.home_banner_item_img, ((CarouselMainActivity.Page)data).netImg,
+                            ((CarouselMainActivity.Page)data).defaultImg,((CarouselMainActivity.Page)data).errorImg)
+                    .setText(R.id.home_banner_item_text, (((CarouselMainActivity.Page)data)).text);
+        }else {
+            viewHolder.setConvertView(R.layout.item)
+                    .setImageResource(R.id.home_banner_item_img, ((CarouselMainActivity.Page)data).netImg, 0,0)
+                    .setText(R.id.home_banner_item_text, (((CarouselMainActivity.Page)data)).text);
+        }
         viewHolder.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -41,4 +54,6 @@ public class CarouselAdapter extends CarouselBaseAdapter {
     public interface PageClickListener {
         void onItemClick(View view, int position);
     }
+
+
 }

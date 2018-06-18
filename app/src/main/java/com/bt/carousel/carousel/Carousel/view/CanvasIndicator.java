@@ -7,19 +7,20 @@ import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
 
 import com.bt.carousel.carousel.Carousel.CarouselConstant;
+import com.bt.carousel.carousel.Carousel.base.IndicatorBaseView;
 
 
 /**
  * Created by 18030693 on 2018/6/5.
  */
 
-public class CanvasIndicator extends IndicatorBaseView{
+public class CanvasIndicator extends IndicatorBaseView {
     private Paint mPaint;
 
     private int mIndicatorSelected = 0;
     private int mIndicatorUnselected = 0;
     //圆形或矩形
-    private int mIndicatorType;
+    public int mIndicatorType;
 
     public CanvasIndicator(Context context,int type) {
         super(context);

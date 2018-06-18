@@ -4,13 +4,14 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import com.bt.carousel.carousel.Carousel.CarouselConstant;
+import com.bt.carousel.carousel.Carousel.base.CarouselBaseView;
 
 
 /**
  * Created by 18030693 on 2018/6/6.
  */
 
-public class CarouselView extends CarouselBaseView{
+public class CarouselView extends CarouselBaseView {
 
     public CarouselView(Context context) {
         super(context);
@@ -35,18 +36,17 @@ public class CarouselView extends CarouselBaseView{
      * @return
      */
     public CarouselBaseView indicator(int type){
-        if (mIndicator == null) {
-            switch (type){
-                case CarouselConstant.CIRCLE_STYLE:
-                case CarouselConstant.LINE_STYLE:
-                    mIndicator =new CanvasIndicator(getContext(),type);
-                    break;
-                case CarouselConstant.IMG_STYLE:
-                    mIndicator =new DrawableIndicator(getContext());
-                    break;
-                default:
-                    break;
-            }
+        clearIndicator();
+        switch (type){
+            case CarouselConstant.CIRCLE_STYLE:
+            case CarouselConstant.LINE_STYLE:
+                indicator =new CanvasIndicator(getContext(),type);
+                break;
+            case CarouselConstant.IMG_STYLE:
+                indicator =new DrawableIndicator(getContext());
+                break;
+            default:
+                break;
         }
         return this;
     }

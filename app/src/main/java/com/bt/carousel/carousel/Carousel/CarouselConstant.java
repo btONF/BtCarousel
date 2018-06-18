@@ -15,9 +15,11 @@ public class CarouselConstant {
     public static final int DEFAULT_UNSELECTED_INDICATOR_COLOR = R.color.indicator_off;
     public static final int DEFAULT_SELECTED_INDICATOR_DRAWABLE = R.drawable.red_dot;
     public static final int DEFAULT_UNSELECTED_INDICATOR_DRAWABLE = R.drawable.gray_dot;
+    public static final int[] DEFAULT_PAGE_BG_COLOR = {R.color.page_1,R.color.page_2,R.color.page_3,R.color.page_4};
 
-    public static final int DEFAULT_NO_DATA_BG = R.drawable.default_bg;
-
+    public static final int DEFAULT_NO_DATA_BG = R.drawable.carousel_default;
+    public static final int DEFAULT_ERROR_BG = R.drawable.carousel_error;
+    public static final String DEFAULT_NET_BG = "https://btonf.top/img/carousel_net.png";
     public static final int DEFAULT_TIME_PERIOD = 3000;
     public static final float DEFAULT_INDICATOR_WIDTH = 4.0f;
     public static final float DEFAULT_INDICATOR_HEIGHT = 4.0f;
