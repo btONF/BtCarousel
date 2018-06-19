@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by 18030693 on 2018/6/7.
  */
@@ -20,11 +22,12 @@ import com.bumptech.glide.request.RequestOptions;
 public class PagerViewHolder {
     //view数组
     private final SparseArray<View> views;
-    public Context context;
+    private WeakReference<Context> mContext;
+    //public Context context;
     //根视图
     public View convertView;
     public PagerViewHolder(Context context) {
-        this.context = context;
+        mContext= new WeakReference<>(context);
         this.views = new SparseArray<>();
     }
 
@@ -43,8 +46,10 @@ public class PagerViewHolder {
      * 设置根视图
      */
     public PagerViewHolder setConvertView(@LayoutRes int layoutId) {
-        LayoutInflater inflater = LayoutInflater.from(context);
-        convertView = inflater.inflate(layoutId,null);
+        if (mContext.get()!=null) {
+            LayoutInflater inflater = LayoutInflater.from(mContext.get());
+            convertView = inflater.inflate(layoutId, null);
+        }
         return this;
     }
 
@@ -101,18 +106,20 @@ public class PagerViewHolder {
      */
     public void loadImageUrl(ImageView view,CharSequence imageUrl, @DrawableRes int defaultImageResId,
                              @DrawableRes int errorImageResId) {
-        RequestOptions options = new RequestOptions();
-        if (defaultImageResId!=0) {
-            options.placeholder(defaultImageResId);
+        if (mContext.get()!=null) {
+            RequestOptions options = new RequestOptions();
+            if (defaultImageResId != 0) {
+                options.placeholder(defaultImageResId);
+            }
+            if (errorImageResId != 0) {
+                options.error(errorImageResId);
+            }
+            if (defaultImageResId != 0) {
+                options.fallback(defaultImageResId);
+            }
+            Glide.with(mContext.get()).
+                    load(imageUrl).apply(options)
+                    .into(view);
         }
-        if (errorImageResId!=0) {
-            options.error(errorImageResId);
-        }
-        if (defaultImageResId!=0) {
-            options.fallback(defaultImageResId);
-        }
-        Glide.with(context).
-                load(imageUrl).apply(options)
-                .into(view);
     }
 }
