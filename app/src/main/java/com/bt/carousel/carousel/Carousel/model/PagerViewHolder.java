@@ -16,7 +16,7 @@ import com.bumptech.glide.request.RequestOptions;
 import java.lang.ref.WeakReference;
 
 /**
- * Created by 18030693 on 2018/6/7.
+ * Created by btONF on 2018/6/7.
  */
 
 public class PagerViewHolder {

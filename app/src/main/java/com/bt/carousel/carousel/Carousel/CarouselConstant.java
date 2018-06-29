@@ -1,32 +1,32 @@
 package com.bt.carousel.carousel.Carousel;
 
 
+import android.content.Context;
+import android.util.TypedValue;
+
 import com.bt.carousel.carousel.R;
 
 /**
- * Created by 18030693 on 2018/6/6.
+ * Created by btONF on 2018/6/6.
  */
 
 public class CarouselConstant {
-    public static final int LINE_STYLE = 1;
-    public static final int CIRCLE_STYLE = 2;
-    public static final int IMG_STYLE = 3;
-    public static final int DEFAULT_SELECTED_INDICATOR_COLOR = R.color.indicator_on;
-    public static final int DEFAULT_UNSELECTED_INDICATOR_COLOR = R.color.indicator_off;
-    public static final int DEFAULT_SELECTED_INDICATOR_DRAWABLE = R.drawable.red_dot;
-    public static final int DEFAULT_UNSELECTED_INDICATOR_DRAWABLE = R.drawable.gray_dot;
+    //样例默认背景色
     public static final int[] DEFAULT_PAGE_BG_COLOR = {R.color.page_1,R.color.page_2,R.color.page_3,R.color.page_4};
-
+    //样例默认背景图
     public static final int DEFAULT_NO_DATA_BG = R.drawable.carousel_default;
+    //样例默认出错图
     public static final int DEFAULT_ERROR_BG = R.drawable.carousel_error;
+    //样例默认网络图
     public static final String DEFAULT_NET_BG = "https://btonf.top/img/carousel_net.png";
-    public static final int DEFAULT_TIME_PERIOD = 3000;
-    public static final float DEFAULT_INDICATOR_WIDTH = 4.0f;
-    public static final float DEFAULT_INDICATOR_HEIGHT = 4.0f;
-    public static final float DEFAULT_INDICATOR_SPACING = 4.0f;
-    public static final float DEFAULT_VIEW_PAGER_SCALE = 0.0f;
-    public static final float DEFAULT_BOTTOM_MARGIN = 5.0F;
 
-
+    /**
+     * @param dp    dp转px
+     * @return
+     */
+    public static float dp2Px(Context context, float dp){
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                dp,context.getResources().getDisplayMetrics());
+    }
 
 }

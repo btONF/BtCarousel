@@ -2,18 +2,24 @@ package com.bt.carousel.carousel.Carousel.base;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.widget.FrameLayout;
 
 import com.bt.carousel.carousel.Carousel.CarouselConstant;
 
 
 /**
- * Created by 18030693 on 2018/6/6.
+ * Created by btONF on 2018/6/6.
  */
 
 public abstract class IndicatorBaseView extends FrameLayout{
-
+    public FrameLayout.LayoutParams params;
+    public static final float DEFAULT_INDICATOR_WIDTH = 4.0f;
+    public static final float DEFAULT_INDICATOR_HEIGHT = 4.0f;
+    public static final float DEFAULT_INDICATOR_SPACING = 4.0f;
+    public static final float DEFAULT_BOTTOM_MARGIN = 5.0f;
+    //通用背景
+    protected int mIndicatorSelected = 0;
+    protected int mIndicatorUnselected = 0;
     //通用指示器属性
     public float indicatorWidth ;
     public float indicatorHeight ;
@@ -23,7 +29,6 @@ public abstract class IndicatorBaseView extends FrameLayout{
     //当前位置
     protected int indicatedPosition;
 
-    boolean isFirstMeasure = true;
 
     public IndicatorBaseView(Context context) {
         this(context,null);
@@ -38,43 +43,66 @@ public abstract class IndicatorBaseView extends FrameLayout{
         initDefaultData();
     }
 
+    /**
+     * 默认值初始化
+     */
     private void initDefaultData() {
-        indicatorWidth = dp2Px(CarouselConstant.DEFAULT_INDICATOR_WIDTH);
-        indicatorHeight = dp2Px(CarouselConstant.DEFAULT_INDICATOR_HEIGHT);
-        indicatorSpacing = dp2Px(CarouselConstant.DEFAULT_INDICATOR_SPACING);
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        if (isFirstMeasure) {
-            isFirstMeasure = false;
-            indicatedPosition = 1;
-        }
+        indicatorWidth = CarouselConstant.dp2Px(getContext(),DEFAULT_INDICATOR_WIDTH);
+        indicatorHeight = CarouselConstant.dp2Px(getContext(),DEFAULT_INDICATOR_HEIGHT);
+        indicatorSpacing = CarouselConstant.dp2Px(getContext(),DEFAULT_INDICATOR_SPACING);
     }
 
     /**
-     * @param dp    dp转px
+     * @param width 指示器每个item宽度
      * @return
      */
-    public float dp2Px(float dp){
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                dp,getContext().getResources().getDisplayMetrics());
+    public IndicatorBaseView width(float width){
+        indicatorWidth =  CarouselConstant.dp2Px(getContext(), width);
+        return this;
     }
 
     /**
-     * @param count 数据源count
+     * @param height 指示器每个item高度
+     * @return
      */
-    public void setCount(int count) {
-        if (count>2) {
-            this.count = count-2;
-        }else {
-            this.count = 1;
-        }
-        initView();
+    public IndicatorBaseView height(float height){
+        indicatorHeight = CarouselConstant.dp2Px(getContext(),height);
+        return this;
     }
 
-    public abstract void setBgResource(int select,int unSelect);
-    public abstract void refreshView();
-    public abstract void initView();
+    /**
+     * @param spacing 指示器每个item之间的距离
+     * @return
+     */
+    public IndicatorBaseView spacing(float spacing){
+        indicatorSpacing = CarouselConstant.dp2Px(getContext(),spacing);
+        return this;
+    }
+
+    /**
+     * ViewPager内的接口实现,用于与ViewPager绑定
+     */
+    public ViewPagerBaseView.ViewPagerScrollListener viewPagerScrollListener = new ViewPagerBaseView.ViewPagerScrollListener() {
+        @Override
+        public void onPageSelected(int position,int childCount) {
+            if ( childCount>2) {
+                int realCount = childCount-2;
+                if (position%realCount==0) {
+                    indicatedPosition = realCount;
+                }else {
+                    indicatedPosition = position%realCount;
+                }
+                //刷新状态
+                changeStatus();
+            }
+        }
+    };
+    //设置指示器item选中(未选中)背景
+    public abstract IndicatorBaseView setBgResource(int select,int unSelect);
+    //更新视图
+    protected abstract void updateView(int newCount);
+    //刷新状态
+    public abstract void changeStatus();
+    //根据参数构造params
+    public abstract void build();
 }

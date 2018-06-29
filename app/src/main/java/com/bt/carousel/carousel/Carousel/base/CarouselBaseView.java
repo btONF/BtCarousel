@@ -6,34 +6,32 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
-import com.bt.carousel.carousel.Carousel.CarouselConstant;
 
 
 /**
- * Created by 18030693 on 2018/6/7.
+ * Created by btONF on 2018/6/7.
  */
 
 public class CarouselBaseView extends FrameLayout {
     private static final String TAG = "CarouselBaseView";
-    private static final int SWITCH_VIEW_PAGER = 1;
+    private final int SWITCH_VIEW_PAGER = 1;
+    public final int DEFAULT_TIME_PERIOD = 3000;
+    public final float DEFAULT_VIEW_PAGER_SCALE = 0.0f;
     private  int mTimePeriod;
     private  float mScale;
     private  int  mNoDataBg;
     private  boolean isStartCarouse = false;
 
     private SwitchHandler mHandler;
+
     private PagerAdapter mPagerAdapter;
-    private ViewPager mViewPager;
-    public IndicatorBaseView indicator;
+    private ViewPagerBaseView mViewPager;
+    private IndicatorBaseView mIndicator;
 
     public CarouselBaseView( Context context) {
         this(context,null);
@@ -46,104 +44,97 @@ public class CarouselBaseView extends FrameLayout {
 
     public CarouselBaseView(Context context,AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initDefaultData();
-        initViewPager();
+        init();
     }
 
     /**
-     * 默认值
+     * 初始化
      */
-    private void initDefaultData() {
-        mTimePeriod = CarouselConstant.DEFAULT_TIME_PERIOD;
-        mScale = CarouselConstant.DEFAULT_VIEW_PAGER_SCALE;
-        mNoDataBg = CarouselConstant.DEFAULT_NO_DATA_BG;
-    }
-
-
-    /**
-     * 初始化Viewpager并设置引用
-     * 默认载入viewpager
-     */
-    public void initViewPager() {
+    private void init() {
+        mTimePeriod = DEFAULT_TIME_PERIOD;
+        mScale = DEFAULT_VIEW_PAGER_SCALE;
+        mNoDataBg = 0;
         mHandler = new SwitchHandler();
-        ViewPager viewPager = new ViewPager(getContext());
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        viewPager.setLayoutParams(params);
-        addView(viewPager);
-        mViewPager = viewPager;
     }
 
     /**
-     * @param adapter
-     * 绑定ViewpagerAdapter
+     * @param viewPager 设置viewpager
+     * @return
      */
-    public void bindAdapter(PagerAdapter adapter) {
-        if (adapter!=null){
-            mPagerAdapter = adapter;
-            mPagerAdapter.registerDataSetObserver(dataOB);
-            mViewPager.setAdapter(mPagerAdapter);
-            refreshView();
+    public CarouselBaseView viewPager(ViewPagerBaseView viewPager){
+        if (mViewPager != null){
+            removeView(mViewPager);
         }
-    }
-
-
-    /**
-     * 设置通用indicator载入方法
-     */
-    public void load(){
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.bottomMargin = (int) dp2Px(CarouselConstant.DEFAULT_BOTTOM_MARGIN);
-        params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        indicator.setLayoutParams(params);
-        addView(indicator);
-        refreshView();
-    }
-
-    /**
-     * 更新ViewPager视图
-     * 1.绑定适配器时刷新
-     * 2.添加indicator时刷新
-     * 3.数据源变更时刷新
-     */
-    private void refreshView() {
-        mViewPager.removeOnPageChangeListener(mPageLoopListener);
-        if (mPagerAdapter.getCount() == 0){
-            mViewPager.setVisibility(GONE);
-            setBackgroundResource(mNoDataBg);
-        }else {
-            mViewPager.addOnPageChangeListener(mPageLoopListener);
-            if (mPagerAdapter.getCount() == 1) {
-                mViewPager.setCurrentItem(0, false);
-            } else {
-                mViewPager.setCurrentItem(1, false);
-            }
-            mViewPager.setVisibility(VISIBLE);
-            setBackgroundResource(0);
+        if (viewPager!=null) {
+            mViewPager = viewPager;
         }
-        resumeCarouse();
-        refreshIndicator();
+        return this;
     }
 
     /**
-     * 更新indicator视图
+     * @param indicator 设置指示器
+     * @return
      */
-    public void refreshIndicator(){
+    public CarouselBaseView indicator(IndicatorBaseView indicator){
+        if (mIndicator != null){
+            removeView(mIndicator);
+        }
         if (indicator != null) {
-            if (mPagerAdapter.getCount() <= 1) {
-                indicator.setVisibility(GONE);
-            } else {
-                indicator.setVisibility(VISIBLE);
-                ViewGroup.LayoutParams params = indicator.getLayoutParams();
-                params.width = (int) (indicator.indicatorWidth * (mPagerAdapter.getCount() - 2) +
-                        indicator.indicatorSpacing  * (mPagerAdapter.getCount() - 3));
-                params.height = (int) indicator.indicatorHeight;
-                indicator.setLayoutParams(params);
+            mIndicator = indicator;
+        }
+        return this;
+    }
+
+    /**
+     * @param adapter 设置适配器
+     * @return
+     */
+    public CarouselBaseView adapter(PagerAdapter adapter){
+        if (adapter!=null) {
+            mPagerAdapter = adapter;
+        }
+        return this;
+    }
+
+
+    /**
+     * 载入视图(包括视图内部初始化)
+     */
+    public void build(){
+        removeAllViews();
+        if (mViewPager != null) {
+            addView(mViewPager);
+        }
+        if (mIndicator != null) {
+            mViewPager.setViewPagerScrollListener(mIndicator.viewPagerScrollListener);
+            addView(mIndicator);
+        }
+        if (mPagerAdapter!=null){
+            mViewPager.setViewPager(mPagerAdapter);
+            mPagerAdapter.registerDataSetObserver(dataOB);
+        }
+        updateView();
+
+    }
+
+
+    /**
+     * 载入内部视图
+     */
+    private void updateView() {
+        if (mPagerAdapter!=null) {
+            setBackgroundResource(mPagerAdapter.getCount() == 0 ? mNoDataBg:0);
+            if (mViewPager!=null){
+                mViewPager.updateView(mPagerAdapter.getCount());
             }
-            indicator.indicatedPosition = 1;
-            indicator.setCount(mPagerAdapter.getCount());
+            if (mIndicator!=null){
+                mIndicator.updateView(mPagerAdapter.getCount());
+            }
+        }else {
+            Log.e("BtCarousel","PagerAdapter Can Not Be Null !!");
         }
     }
+
 
     /**
      * 开始轮播
@@ -179,6 +170,8 @@ public class CarouselBaseView extends FrameLayout {
     public void pauseCarouse() {
         mHandler.removeMessages(SWITCH_VIEW_PAGER);
     }
+
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //重绘时按照设定的比例绘制
@@ -199,7 +192,7 @@ public class CarouselBaseView extends FrameLayout {
     private DataSetObserver dataOB = new DataSetObserver() {
         @Override
         public void onChanged() {
-            refreshView();
+            updateView();
         }
     };
 
@@ -221,52 +214,6 @@ public class CarouselBaseView extends FrameLayout {
                     break;
             }
         }
-    }
-
-    /**
-     * 翻页监听,制造循环效果
-     * 设置indicator之后可以使其与viewpager绑定
-     */
-    private ViewPager.OnPageChangeListener mPageLoopListener = new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int i, float v, int i1) {
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-
-            if (indicator!=null && mPagerAdapter.getCount()>1) {
-                int realCount = mPagerAdapter.getCount()-2;
-                if (position%realCount==0) {
-                    indicator.indicatedPosition = realCount;
-                }else {
-                    indicator.indicatedPosition = position%realCount;
-                }
-                //仅刷新状态不刷新布局
-                indicator.refreshView();
-            }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-            if (state == ViewPager.SCROLL_STATE_IDLE) {
-                if (mViewPager.getCurrentItem() == 0) {
-                    mViewPager.setCurrentItem(mPagerAdapter.getCount() - 2, false);
-                }
-                if (mViewPager.getCurrentItem() == mPagerAdapter.getCount() - 1) {
-                    mViewPager.setCurrentItem(1, false);
-                }
-            }
-        }
-    };
-
-    /**
-     * @param dp float类型dp值
-     * @return  px
-     */
-    public float dp2Px(float dp){
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                dp,getContext().getResources().getDisplayMetrics());
     }
 
     /**
@@ -295,9 +242,10 @@ public class CarouselBaseView extends FrameLayout {
                 i--;
             }
         }
-        indicator =null;
+        mIndicator =null;
     }
 
+    //手势监听,手势翻页时暂停自动滚动
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (isStartCarouse) {
@@ -336,33 +284,6 @@ public class CarouselBaseView extends FrameLayout {
         return this;
     }
 
-    /**
-     * @param width indicator 每个元素宽度, indicator为圆时该参数为圆直径
-     * @param height indicator 高度, indicator为圆时该参数为indicator自身高度
-     * @param spacing indicator 间距
-     * @return
-     */
-    public CarouselBaseView size(float width, float height, float spacing){
-        if (indicator!=null) {
-            indicator.indicatorWidth = dp2Px(width);
-            indicator.indicatorHeight = dp2Px(height);
-            indicator.indicatorSpacing = dp2Px(spacing);
-        }
-        return this;
-    }
-
-    /**
-     * @param select 当前页面对应的 indicator颜色(仅对canvas绘图有效)
-     * @param unSelect 默认背景色 (仅对canvas绘图有效)
-     * @return
-     */
-    public CarouselBaseView indicatorBg(int select, int unSelect){
-        if(indicator!=null) {
-            indicator.setBgResource(select, unSelect);
-        }
-        return this;
-    }
-
 
     /**
      * @param noDataBg 设置默认占位背景, 设置为0则为无背景
@@ -370,7 +291,12 @@ public class CarouselBaseView extends FrameLayout {
      */
     public CarouselBaseView noDataBg(int noDataBg) {
         mNoDataBg = noDataBg;
-        setBackgroundResource(mNoDataBg);
         return this;
     }
+
+    public IndicatorBaseView getIndicator() {
+        return mIndicator;
+    }
+
+
 }

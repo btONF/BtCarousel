@@ -1,6 +1,7 @@
 package com.bt.carousel.carousel.Carousel.base;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.support.v4.view.PagerAdapter;
 import android.util.SparseArray;
 import android.view.View;
@@ -12,14 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by 18030693 on 2018/6/12.
+ * Created by btONF on 2018/6/12.
  */
 
 public abstract class CarouselBaseAdapter<T> extends PagerAdapter {
     private final Context mContext;
     private List<T> mList = new ArrayList<>();
     private final SparseArray<PagerViewHolder> mViewHolder = new SparseArray<>();
-
+    //存储已设置的Observer
+    private List<DataSetObserver> mObserverList = new ArrayList<>();
     protected CarouselBaseAdapter(Context context) {
         mContext = context;
     }
@@ -61,7 +63,6 @@ public abstract class CarouselBaseAdapter<T> extends PagerAdapter {
         return convertView;
     }
 
-
     /*
      * 当前页面是否发生改变
      * 默认不改变,不会进行页面重绘,会导致含有前后缓存页,页面内容不更新
@@ -71,6 +72,12 @@ public abstract class CarouselBaseAdapter<T> extends PagerAdapter {
         return POSITION_NONE;
     }
 
+
+    /**
+     * 0   : 无数据
+     * 1   : 仅1条数据
+     * >=4 : 2条及以上的原数据(页面)
+     */
     @Override
     public int getCount() {
         return mList==null?0:mList.size();
@@ -87,7 +94,35 @@ public abstract class CarouselBaseAdapter<T> extends PagerAdapter {
             container.removeView(mViewHolder.get(position).convertView);
         }
     }
-
-    protected abstract void convert(PagerViewHolder viewHolder,T data, int position);
+    //防止重复注册
+    @Override
+    public void registerDataSetObserver(DataSetObserver observer) {
+        if (observer==null){
+            return;
+        }
+        for (DataSetObserver oldObserver : mObserverList){
+            if (oldObserver == observer){
+                return;
+            }
+        }
+        mObserverList.add(observer);
+        super.registerDataSetObserver(observer);
+    }
+    //防止未注册过导致报错
+    @Override
+    public void unregisterDataSetObserver(DataSetObserver observer) {
+        if (observer==null){
+            return;
+        }
+        for (DataSetObserver oldObserver : mObserverList){
+            if (oldObserver == observer){
+                mObserverList.remove(observer);
+                super.unregisterDataSetObserver(observer);
+                return;
+            }
+        }
+    }
+    //设置数据
+    protected abstract void convert(PagerViewHolder viewHolder, T data, int position);
 
 }

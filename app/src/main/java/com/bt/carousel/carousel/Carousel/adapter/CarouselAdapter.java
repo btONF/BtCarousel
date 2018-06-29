@@ -10,7 +10,7 @@ import com.bt.carousel.carousel.R;
 
 
 /**
- * Created by 15120033 on 2018/5/28.
+ * Created by btONF on 2018/5/28.
  */
 public class CarouselAdapter extends CarouselBaseAdapter {
     private PageClickListener mPageClickListener;
@@ -27,19 +27,23 @@ public class CarouselAdapter extends CarouselBaseAdapter {
     @Override
     protected void convert(PagerViewHolder viewHolder,Object data, final int position) {
         if (!((CarouselMainActivity.Page)data).isUseNet) {
+            //案例 >> 使用网络图片
             viewHolder.setConvertView(R.layout.item)
                     .setBackgroundResource(R.id.page_parent, (((CarouselMainActivity.Page)data)).imgRes)
                     .setText(R.id.home_banner_item_text, (((CarouselMainActivity.Page)data)).text);
         }else if(((CarouselMainActivity.Page)data).isUseDefault){
+            //案例 >> 使用默认图片
             viewHolder.setConvertView(R.layout.item)
                     .setImageResource(R.id.home_banner_item_img, ((CarouselMainActivity.Page)data).netImg,
                             ((CarouselMainActivity.Page)data).defaultImg,((CarouselMainActivity.Page)data).errorImg)
                     .setText(R.id.home_banner_item_text, (((CarouselMainActivity.Page)data)).text);
         }else {
+            //案例 >> 仅适用背景色
             viewHolder.setConvertView(R.layout.item)
                     .setImageResource(R.id.home_banner_item_img, ((CarouselMainActivity.Page)data).netImg, 0,0)
                     .setText(R.id.home_banner_item_text, (((CarouselMainActivity.Page)data)).text);
         }
+        //自定义点击事件
         viewHolder.convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

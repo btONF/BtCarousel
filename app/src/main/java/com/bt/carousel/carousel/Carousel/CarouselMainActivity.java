@@ -6,21 +6,23 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bt.carousel.carousel.Carousel.adapter.CarouselAdapter;
+import com.bt.carousel.carousel.Carousel.view.BtViewPager;
 import com.bt.carousel.carousel.Carousel.view.CanvasIndicator;
 import com.bt.carousel.carousel.Carousel.view.CarouselView;
+import com.bt.carousel.carousel.Carousel.view.DrawableIndicator;
 import com.bt.carousel.carousel.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by 18030693 on 2018/6/5.
+ * Created by btONF on 2018/6/5.
  */
 
 public class CarouselMainActivity extends Activity  implements View.OnClickListener{
     private CarouselView mCarouselView;
     private CarouselAdapter mCarouselAdapter;
-    List<Page> model = new ArrayList<>();
+    private List<Page> model = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +36,12 @@ public class CarouselMainActivity extends Activity  implements View.OnClickListe
         mCarouselView = (CarouselView) findViewById(R.id.carousel_view);
         mCarouselAdapter = new CarouselAdapter(this);
         mCarouselAdapter.setPageClickListener(mPageClickListener);
-        mCarouselView.bindAdapter(mCarouselAdapter);
+        BtViewPager viewPager = new BtViewPager(this);
+        viewPager.build();
+        CanvasIndicator canvasIndicator = new CanvasIndicator(this,CanvasIndicator.CIRCLE_STYLE);
+        canvasIndicator.build();
+        mCarouselView.viewPager(viewPager).adapter(mCarouselAdapter).indicator(canvasIndicator).build();
+
         findViewById(R.id.start_fast_btn).setOnClickListener(this);
         findViewById(R.id.start_slow_btn).setOnClickListener(this);
         findViewById(R.id.stop_btn).setOnClickListener(this);
@@ -131,15 +138,21 @@ public class CarouselMainActivity extends Activity  implements View.OnClickListe
                 break;
             //圆形指示器
             case R.id.indicator_circle:
-                mCarouselView.indicator(CarouselConstant.CIRCLE_STYLE).load();
+                CanvasIndicator circleIndicator = new CanvasIndicator(this,CanvasIndicator.CIRCLE_STYLE);
+                circleIndicator.build();
+                mCarouselView.indicator(circleIndicator).build();
                 break;
             //矩形指示器
             case R.id.indicator_line:
-                mCarouselView.indicator(CarouselConstant.LINE_STYLE).load();
+                CanvasIndicator canvasIndicator = new CanvasIndicator(this,CanvasIndicator.LINE_STYLE);
+                canvasIndicator.build();
+                mCarouselView.indicator(canvasIndicator).build();
                 break;
             //图片指示器
             case R.id.indicator_img:
-                mCarouselView.indicator(CarouselConstant.IMG_STYLE).load();
+                DrawableIndicator drawableIndicator = new DrawableIndicator(this);
+                drawableIndicator.build();
+                mCarouselView.indicator(drawableIndicator).build();
                 break;
             //移除指示器
             case R.id.indicator_remove:
@@ -155,35 +168,41 @@ public class CarouselMainActivity extends Activity  implements View.OnClickListe
                 break;
             //大指示器
             case R.id.indicator_big:
-                if (mCarouselView.indicator instanceof CanvasIndicator) {
-                    if (((CanvasIndicator)mCarouselView.indicator).mIndicatorType==CarouselConstant.CIRCLE_STYLE) {
-                        mCarouselView.size(10.0f, 10.0f, 10.0f).refreshIndicator();
+                if (mCarouselView.getIndicator() instanceof CanvasIndicator) {
+                    if (((CanvasIndicator)mCarouselView.getIndicator()).mIndicatorType==CanvasIndicator.CIRCLE_STYLE) {
+                        mCarouselView.getIndicator().width(10.0f).height( 10.0f).spacing(10.0f).build();
+                        mCarouselView.build();
                     }else {
-                        mCarouselView.size(10.0f, 3.0f, 10.0f).refreshIndicator();
+                        mCarouselView.getIndicator().width(10.0f).height( 3.0f).spacing(10.0f).build();
+                        mCarouselView.build();
                     }
                 }else {
-                    mCarouselView.size(10.0f, 10.0f, 10.0f).refreshIndicator();
+                    mCarouselView.getIndicator().width(10.0f).height( 10.0f).spacing(10.0f).build();
+                    mCarouselView.build();
                 }
                 break;
             //小指示器
             case R.id.indicator_small:
-                if (mCarouselView.indicator instanceof CanvasIndicator) {
-                    if (((CanvasIndicator)mCarouselView.indicator).mIndicatorType==CarouselConstant.CIRCLE_STYLE) {
-                        mCarouselView.size(4.0f, 4.0f, 4.0f).refreshIndicator();
+                if (mCarouselView.getIndicator() instanceof CanvasIndicator) {
+                    if (((CanvasIndicator)mCarouselView.getIndicator()).mIndicatorType==CanvasIndicator.CIRCLE_STYLE) {
+                        mCarouselView.getIndicator().width(4.0f).height( 4.0f).spacing(4.0f).build();
+                        mCarouselView.build();
                     }else {
-                        mCarouselView.size(4.0f, 1.0f, 4.0f).refreshIndicator();
+                        mCarouselView.getIndicator().width(4.0f).height( 1.0f).spacing(4.0f).build();
+                        mCarouselView.build();
                     }
                 }else {
-                    mCarouselView.size(10.0f, 10.0f, 10.0f).refreshIndicator();
+                    mCarouselView.getIndicator().width(4.0f).height( 4.0f).spacing(4.0f).build();
+                    mCarouselView.build();
                 }
                 break;
             //指示器颜色(灰白)
             case R.id.indicator_black:
-                mCarouselView.indicatorBg(R.color.indicator_on,R.color.indicator_off).refreshIndicator();
+                mCarouselView.getIndicator().setBgResource(R.color.indicator_on,R.color.indicator_off).changeStatus();
                 break;
             //指示器颜色(彩色)
             case R.id.indicator_color:
-                mCarouselView.indicatorBg(R.color.indicator_color_on,R.color.indicator_color_off).refreshIndicator();
+                mCarouselView.getIndicator().setBgResource(R.color.indicator_color_on,R.color.indicator_color_off).changeStatus();
                 break;
             case R.id.use_default_img:
                 initData(4,true,true);
