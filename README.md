@@ -5,6 +5,8 @@ A Carousel Easy To Use
 
 ![演示图片](https://btonf.top/img/carousel_sample.gif)
 
+图片帧数较低谅解~
+
 > 背景:
 > 
 > 笔者公司的业务代码属于比较定制化的类型,即针对于某一环境所编写的代码,无法进行代码重用,并且如果需求有更改,代码改动量也极其巨大
@@ -13,7 +15,6 @@ A Carousel Easy To Use
 
 ## 使用:
 
-`该1.0版本暂无法使用maven引入`
 
 ### **Step1 :** 将以下布局加入`layout`中,宽高可以自行设定或者使用 `CarouselView..scale(float scale)`方法进行比例设置.
 
@@ -54,14 +55,23 @@ public class CarouselAdapter extends CarouselBaseAdapter {
 > - `setImageResource(@IdRes int viewId, @DrawableRes int imageResId)` 设置对应`viewId`的背景图/drawable(本地)
 > - `setImageResource(@IdRes int viewId,CharSequence imageUrl, @DrawableRes int defaultImageResId,@DrawableRes int errorImageResId)` 设置对应`viewId`加载网络图片,默认占位图及错误占位图.如不需要可将参数置0
 
-### **Step3 :** 实例化`Apdater`并与`CarouselView`的实例进行绑定.
+### **Step3 :** 实例化`Apdater`,`ViewPager`,`Indicator`(可选)并与`CarouselView`的实例进行绑定.
 
 ``` java
+//获取实例
 mCarouselView = (CarouselView) findViewById(R.id.carousel_view);
-mCarouselAdapter = new CarouselAdapter(this);
-//传入数据
-mCarouselAdapter.setData(model);
-mCarouselView.bindAdapter(mCarouselAdapter);
+//实例化adapter
+CarouselAdapter carouselAdapter = new CarouselAdapter(this);
+//实例化ViewPager
+BtViewPager viewPager = new BtViewPager(this);
+//构建viewPager
+viewPager.build();
+//实例化Indicator ,此处使用圆形canvas绘制
+CanvasIndicator canvasIndicator = new CanvasIndicator(this,CanvasIndicator.CIRCLE_STYLE);
+//构建Indicator
+canvasIndicator.build();
+//轮播构建
+mCarouselView.viewPager(viewPager).adapter(carouselAdapter).indicator(canvasIndicator).build();
 ```
 
 ### **Finish :** 轮播正常显示啦.或许现在的界面很丑,你可以通过以下方法去定制.
@@ -70,19 +80,17 @@ mCarouselView.bindAdapter(mCarouselAdapter);
 
 ## 扩展
 
-**1 .** `CarouselView.startCarousel()` 开始轮播.
-
-**2 .** `CarouselView.stopCarousel()` 停止轮播.
-
-**3 .** `CarouselView.indicator().XXX.load()` 加载指示器,XXX部分可选
-
-**3.1 .** `CarouselView.indicator().size(...).indicatorBg(...).load()` 示例: 加载默认(圆点)指示器,并设置了宽高间距以及指示器颜色
-
-**3.2 .** `CarouselView.indicator().load()`+ `CarouselView.size(...).indicatorBg(...)`等价于上方代码,但是设置`indicator`相关方法一定要在`indicator`后才可调用.
-
-**4 .** 可自定义属性:宽高比, 指示器背景色, 默认占位图, 指示器大小, 指示器位置.... 可在`CarouselBaseView`内查找
+每个组件内部均可自行定制.高度可扩展并且不会出现兼容问题.
 
 ## 更新日志
+
+### 2018-6-29
+
+- 代码重构,组件各自独立,降低耦合.
+- 组件优化,可自行选择需要的组件进行加载.
+- 代码优化,剔除冗余代码,代码高效利用.
+- 修改作者名称.(原工号)
+
 
 ### 2018-6-18
 - 修复设置样式后无法立即生效的BUG
@@ -90,3 +98,4 @@ mCarouselView.bindAdapter(mCarouselAdapter);
 - 目录改动,按类型分类
 - 增加样式设置方法
 - **增加演示界面**
+
